@@ -17,7 +17,7 @@ spec:
     spec:
       containers: 
         - name: webapp
-          image: webapp:v1
+          image: bezve01/webapp:v1
           ports:
             - containerPort: 8000
 ---
@@ -43,7 +43,7 @@ spec:
     spec:
       containers:
         - name: webapp
-          image: webapp:latest
+          image: bezve01/webapp:latest
           ports:
             - containerPort: 8000
 ---
