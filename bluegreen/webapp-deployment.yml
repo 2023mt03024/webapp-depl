@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: webapp-deployment
+  labels:
+    app: webapp
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers: 
+        - name: webapp
+          image: webapp:v1
+          ports:
+            - containerPort: 8000
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: webapp-rollout
+  namespace: default
+spec:
+  replicas: 1
+  selector: 
+    matchLabels: 
+      app: webapp
+  strategy:
+    blueGreen:
+      activeService: webapp-service
+      previewService: webapp-preview-service
+      autoPromotionEnabled: true
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+        - name: webapp
+          image: webapp:latest
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+  namespace: default
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8000
+  selector:
+    app: webapp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-preview-service
+  namespace: default
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8000
+  selector:
+    app: webapp
